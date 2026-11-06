@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Важный вопрос</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+    }
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+      position: relative;
+    }
+    h2 { color: #d63384; margin-bottom: 15px; }
+    p { color: #555; line-height: 1.5; margin-bottom: 25px; }
+    .buttons { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+    button {
+      padding: 12px 28px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.15s ease-out;
+      touch-action: none;
+    }
+    #yes { background-color: #d63384; color: white; }
+    #no  { background-color: #ddd; color: #333; }
+    button:active { transform: scale(0.95); }
+    .result { font-size: 20px; color: #d63384; font-weight: bold; display: none; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div id="question">
+      <h2>Ты меня любишь?</h2>
+      <p>Отвечай честно, я всё равно узнаю правду 💅</p>
+      <div class="buttons">
+        <button id="yes">Да ❤️</button>
+        <button id="no">Нет</button>
+      </div>
+    </div>
+    <div class="result" id="result">Так и знала 😏</div>
+  </div>
+
+  <script>
+    const yesBtn = document.getElementById('yes');
+    const noBtn = document.getElementById('no');
+    const question = document.getElementById('question');
+    const result = document.getElementById('result');
+    const body = document.body;
+
+    // Делаем «Да» свободно летающей кнопкой
+    yesBtn.style.position = 'fixed';
+    yesBtn.style.zIndex = '1000';
+
+    function dodge(e) {
+      const btn = yesBtn.getBoundingClientRect();
+      // Находим центр курсора/пальца
+      const cx = (e.touches ? e.touches[0].clientX : e.clientX);
+      const cy = (e.touches ? e.touches[0].clientY : e.clientY);
+
+      // Вектор от курсора к центру кнопки
+      let dx = btn.left + btn.width / 2 - cx;
+      let dy = btn.top + btn.height / 2 - cy;
+
+      // Если палец/курсор слишком близко — убегаем
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist > 120) return;
+
+      // Направление прочь от курсора
+      const len = dist || 1;
+      const jump = 150;
+      let newLeft = btn.left + (dx / len) * jump;
+      let newTop = btn.top + (dy / len) * jump;
+
+      // Держим кнопку в пределах экрана
+      newLeft = Math.max(5, Math.min(body.clientWidth - btn.width - 5, newLeft));
+      newTop = Math.max(5, Math.min(body.clientHeight - btn.height - 5, newTop));
+
+      yesBtn.style.left = newLeft + 'px';
+      yesBtn.style.top = newTop + 'px';
+    }
+
+    // Реагируем на движение курсора и касания пальцем (для телефона)
+    document.addEventListener('mousemove', dodge);
+    document.addEventListener('touchstart', dodge, { passive: true });
+    document.addEventListener('touchmove', dodge, { passive: true });
+
+    // Кнопка «Да» всё-таки нажалась (чисто на всякий случай 😉)
+    yesBtn.addEventListener('click', () => {
+      question.style.display = 'none';
+      result.textContent = 'Ну наконец-то!! Я знала, что дотянешься 🥰';
+      result.style.display = 'block';
+    });
+
+    // А вот «Нет» — мгновенный приговор
+    noBtn.addEventListener('click', () => {
+      question.style.display = 'none';
+      result.textContent = 'Так и знала 😏';
+      result.style.display = 'block';
+    });
+  </script>
+</body>
+</html>
